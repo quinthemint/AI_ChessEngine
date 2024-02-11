@@ -166,17 +166,20 @@ def ab_pruning(turn, board, max_depth):
     original_fen = board.get_fen()
     legal_moves = list(board.get_legal_moves())
     possible_boards = []
-    for legal_move in legal_moves:
+    for index, legal_move in enumerate(legal_moves):
         new_board = ChessBoard()
         new_board.set_fen(original_fen)
         new_board.make_move(str(legal_move))
-        possible_boards.append(new_board)
+        if (board.is_check()):
+            possible_boards.insert(0, (new_board, index))
+            continue
+        possible_boards.append((new_board, index))
 
     # Go through possibilities and do alpha beta pruning
     values = []
     times = []
     depths_reached = []
-    for board in possible_boards:
+    for board, _ in possible_boards:
         starttime = time.time()
         if turn == 'W':
             this_value, this_depth_reached = alphaBetaMin(board, alpha=-1*np.inf, beta=np.inf, depth=1, max_depth=max_depth)
@@ -192,11 +195,13 @@ def ab_pruning(turn, board, max_depth):
     
     # Choose the board that yields the highest value
     if turn == 'W':
-        best_move = legal_moves[np.argmax(values)]
+        _ , max_index = possible_boards[np.argmax(values)]
+        best_move = legal_moves[max_index]
         # print(f'Best move: {best_move}\n----\n')
-        return best_move, np.max(values), depths_reached[np.argmax(values)]
+        return best_move, np.max(values), depths_reached[max_index]
     else:
-        best_move = legal_moves[np.argmin(values)]
+        _ , min_index = possible_boards[np.argmin(values)]
+        best_move = legal_moves[min_index]
         # print(f'Best move: {best_move}\n----\n')
-        return best_move, np.min(values), depths_reached[np.argmin(values)]
+        return best_move, np.min(values), depths_reached[min_index]
         

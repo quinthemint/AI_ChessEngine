@@ -68,6 +68,9 @@ class ChessBoard:
     def is_in_checkmate(self):
         return self.board.is_checkmate()
     
+    def is_check(self):
+        return self.board.is_check()
+    
     def game_is_done(self):
         if self.is_in_checkmate():
             return True, 'checkmate'
